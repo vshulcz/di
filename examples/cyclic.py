@@ -1,17 +1,40 @@
-from di import Container
+from di import Container, CyclicDependencyException
 
+class ServiceA:
+    def __init__(self, service_b: 'ServiceB'):
+        self.service_b = service_b
 
-class ServiceC:
-    def __init__(self, service_d: 'ServiceD'):
-        self.service_d = service_d
-
-class ServiceD:
-    def __init__(self, service_c: ServiceC):
-        self.service_c = service_c
+class ServiceB:
+    def __init__(self, service_a: 'ServiceA'):
+        self.service_a = service_a
 
 container = Container()
 
-container.register(ServiceC)
-container.register(ServiceD)
+container.register(ServiceA)
+container.register(ServiceB)
 
-service_c = container.resolve(ServiceC)
+try:
+    service_a = container.resolve(ServiceA)
+except CyclicDependencyException as e:
+    print(f"Cyclic dependency detected: {e}")
+
+class NewServiceB:
+    def __init__(self):
+        pass
+
+    def do_something(self):
+        print("New Service B is doing something.")
+
+class NewServiceA:
+    def __init__(self, service_b: NewServiceB):
+        self.service_b = service_b
+
+    def perform_action(self):
+        print("New Service A is performing an action.")
+        self.service_b.do_something()
+
+container.register(NewServiceA)
+container.register(NewServiceB)
+
+new_service_a = container.resolve(NewServiceA)
+new_service_a.perform_action()
