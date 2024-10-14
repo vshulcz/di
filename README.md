@@ -10,5 +10,5 @@ A lightweight and easy-to-use DI container for Python applications. This contain
 ## Installation
 
 ```bash
-git clone https://github.com/vshulcz/di
+git clone https://github.com/vshulcz/di.git
 ```
