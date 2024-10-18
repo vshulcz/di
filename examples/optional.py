@@ -1,13 +1,17 @@
 from abc import ABC, abstractmethod
+
 from di import Container
+
 
 class IOptionalService(ABC):
     @abstractmethod
     def do_something(self): ...
 
+
 class OptionalService(IOptionalService):
     def do_something(self):
         print("Optional service is doing something.")
+
 
 class MainService:
     def __init__(self, optional_service: IOptionalService | None = None):
@@ -18,6 +22,7 @@ class MainService:
             self.optional_service.do_something()
         else:
             print("Optional service is not available.")
+
 
 container = Container()
 

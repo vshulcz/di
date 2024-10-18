@@ -1,12 +1,15 @@
 from di import Container, inject
 
+
 class DependencyA:
     def do_work(self):
         print("Dependency A is working.")
 
+
 class DependencyB:
     def do_work(self):
         print("Dependency B is working.")
+
 
 class PropertyInjectedService:
     @inject
@@ -18,6 +21,7 @@ class PropertyInjectedService:
     def perform_action(self):
         self.dependency_a.do_work()
         self.dependency_b.do_work()
+
 
 container = Container()
 
