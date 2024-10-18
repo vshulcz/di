@@ -5,21 +5,21 @@ A lightweight and easy-to-use DI container for Python applications. This library
 
 ## Features
 
-    * Simple API: Easy to understand and use.
-    * Support for singleton, transient, and scoped services.
-    * Register multiple implementations of the same interface using names.
-    * Inject dependencies into properties after object creation.
-    * Handle optional dependencies gracefully.
+* Simple API: Easy to understand and use.
+* Support for singleton, transient, and scoped services.
+* Register multiple implementations of the same interface using names.
+* Inject dependencies into properties after object creation.
+* Handle optional dependencies gracefully.
 
 
 ## Why Use Dependency Injection?
 
-Dependency Injection is a design pattern that helps in:
+**Dependency Injection is a design pattern that helps in:**
 
-    * Modularity: Breaking down your application into interchangeable components.
-    * Testability: Facilitating unit testing by allowing dependencies to be mocked or stubbed.
-    * Maintainability: Making it easier to update, replace, or refactor components without affecting other parts of the application.
-    * Flexibility: Configuring different implementations of the same interface for various scenarios (e.g., testing, production).
+* Modularity: Breaking down your application into interchangeable components.
+* Testability: Facilitating unit testing by allowing dependencies to be mocked or stubbed.
+* Maintainability: Making it easier to update, replace, or refactor components without affecting other parts of the application.
+* Flexibility: Configuring different implementations of the same interface for various scenarios (e.g., testing, production).
 
 ## Quick Start
 
