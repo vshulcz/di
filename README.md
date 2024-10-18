@@ -1,3 +1,8 @@
+![Build Status](https://github.com/vshulcz/di/actions/workflows/ci.yml/badge.svg)
+![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue)
+![License](https://img.shields.io/github/license/vshulcz/di.svg)
+
+
 # DI Container for Python
 
 A lightweight and easy-to-use DI container for Python applications. This library aims to simplify the management of dependencies in your projects, making your code more modular, testable, and maintainable. This library inspired by popular DI frameworks in other programming languages.
@@ -5,11 +10,11 @@ A lightweight and easy-to-use DI container for Python applications. This library
 
 ## Features
 
-* Simple API: Easy to understand and use.
-* Support for singleton, transient, and scoped services.
+* 🌟 Simple API: Easy to understand and use.
+* 🔄 Support for singleton, transient, and scoped services.
 * Register multiple implementations of the same interface using names.
-* Inject dependencies into properties after object creation.
-* Handle optional dependencies gracefully.
+* 🔍 Inject dependencies into properties after object creation.
+* 🛠 Handle optional dependencies gracefully.
 
 
 ## Why Use Dependency Injection?
