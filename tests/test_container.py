@@ -1,3 +1,4 @@
+from typing import Optional
 import unittest
 from abc import ABC, abstractmethod
 
@@ -211,7 +212,7 @@ class TestContainer(unittest.TestCase):
                 return "Optional service is doing something."
 
         class MainService:
-            def __init__(self, optional_service: IOptionalService | None = None):
+            def __init__(self, optional_service: Optional[IOptionalService] = None):
                 self.optional_service = optional_service
 
             def perform_action(self):
@@ -311,7 +312,7 @@ class TestContainer(unittest.TestCase):
         class IService(ABC): ...
 
         class ConsumerService:
-            def __init__(self, service: IService | None = None):
+            def __init__(self, service: Optional[IService] = None):
                 self.service = service
 
         self.container.register(ConsumerService)
@@ -408,7 +409,7 @@ class TestContainer(unittest.TestCase):
         class IService(ABC): ...
 
         class Consumer:
-            def __init__(self, service: IService | None = None):
+            def __init__(self, service: Optional[IService] = None):
                 self.service = service
 
         self.container.register(Consumer)
