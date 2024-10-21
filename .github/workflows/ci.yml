@@ -39,7 +39,7 @@ jobs:
         
       - name: Install dependencies
         run: |
-          uv install
+          uv init
 
       - name: Run linters
         run: |
