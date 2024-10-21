@@ -1,5 +1,5 @@
 ![Build Status](https://github.com/vshulcz/di/actions/workflows/ci.yml/badge.svg)
-![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12-blue)
+![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)
 ![License](https://img.shields.io/github/license/vshulcz/di.svg)
 
 
