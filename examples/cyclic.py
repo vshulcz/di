@@ -1,4 +1,4 @@
-from di import Container, CyclicDependencyException
+from injex import Container, CyclicDependencyException
 
 
 class ServiceA:

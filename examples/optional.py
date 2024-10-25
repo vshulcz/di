@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from di import Container
+from injex import Container
 
 
 class IOptionalService(ABC):

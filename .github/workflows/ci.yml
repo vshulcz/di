@@ -47,7 +47,7 @@ jobs:
 
       - name: Run type checks
         run: |
-          uv run mypy di tests
+          uv run mypy injex tests
 
       - name: Run tests
         run: |

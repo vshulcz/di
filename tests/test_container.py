@@ -2,7 +2,7 @@ from typing import Optional
 import unittest
 from abc import ABC, abstractmethod
 
-from di import (
+from injex import (
     Container,
     CyclicDependencyException,
     DIException,

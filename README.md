@@ -5,7 +5,7 @@
 
 # DI Container for Python
 
-A lightweight and easy-to-use DI container for Python applications. This library aims to simplify the management of dependencies in your projects, making your code more modular, testable, and maintainable. This library inspired by popular DI frameworks in other programming languages.
+Injex is a lightweight and easy-to-use DI container for Python applications. This library aims to simplify the management of dependencies in your projects, making your code more modular, testable, and maintainable. This library inspired by popular DI frameworks in other programming languages.
 
 
 ## Features
@@ -28,10 +28,10 @@ A lightweight and easy-to-use DI container for Python applications. This library
 
 ## Quick Start
 
-Here's a simple example of integrating DI with FastAPI:
+Here's a simple example of usage Injex:
 ```python
 from abc import ABC, abstractmethod
-from di import Container
+from injex import Container
 
 class IService(ABC):
     @abstractmethod

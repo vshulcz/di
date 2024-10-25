@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from di import Container, LifeStyle, inject
+from injex import Container, LifeStyle, inject
 
 
 class IDatabaseConnection(ABC):

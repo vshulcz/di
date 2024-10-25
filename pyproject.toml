@@ -1,7 +1,7 @@
 [project]
-name = "di"
+name = "injex"
 version = "0.1.0"
-description = "Add your description here"
+description = "DI container for Python applications"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

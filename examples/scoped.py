@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from di import Container, LifeStyle
+from injex import Container, LifeStyle
 
 
 class IRequestHandler(ABC):

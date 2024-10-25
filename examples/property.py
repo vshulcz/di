@@ -1,4 +1,4 @@
-from di import Container, inject
+from injex import Container, inject
 
 
 class DependencyA:
