@@ -15,8 +15,7 @@ from injex import (
 
 
 class IServiceA:
-    def do_something(self):
-        pass
+    def do_something(self): ...
 
 
 class ServiceA(IServiceA):
@@ -25,8 +24,7 @@ class ServiceA(IServiceA):
 
 
 class IServiceB:
-    def do_something(self):
-        pass
+    def do_something(self): ...
 
 
 class ServiceB(IServiceB):
@@ -91,8 +89,7 @@ class ServiceE_order:
 
 class DependencyUnregistered(ABC):
     @abstractmethod
-    def do_something(self):
-        pass
+    def do_something(self): ...
 
 
 class TestContainer(unittest.TestCase):
@@ -193,7 +190,7 @@ class TestContainer(unittest.TestCase):
             def do_work(self):
                 return f"Value is {self.value}"
 
-        def factory(container):
+        def factory():
             return Service(42)
 
         self.container.register_factory(IService, factory)
@@ -374,19 +371,17 @@ class TestContainer(unittest.TestCase):
     def test_factory_with_dependencies(self):
         class IDependency(ABC):
             @abstractmethod
-            def get_value(self): ...
+            def get_value(self) -> int: ...
 
         class Dependency(IDependency):
-            def get_value(self):
+            def get_value(self) -> int:
                 return 99
 
         class IService(ABC):
             @abstractmethod
             def get_combined_value(self): ...
 
-        def factory(container):
-            dependency = container.resolve(IDependency)
-
+        def factory(dependency: IDependency):
             class Service(IService):
                 def get_combined_value(self):
                     return f"Combined value is {dependency.get_value() + 1}"
@@ -402,7 +397,7 @@ class TestContainer(unittest.TestCase):
 
     def test_exception_on_invalid_factory(self):
         with self.assertRaises(ValueError) as context:
-            self.container.register_factory("SomeInterface", "NotACallable")
+            self.container.register_factory("SomeInterface", "NotACallable")  # type: ignore
         self.assertIn("Factory must be callable", str(context.exception))
 
     def test_optional_dependency_not_registered(self):
@@ -448,6 +443,440 @@ class TestContainer(unittest.TestCase):
         with self.assertRaises(CustomException) as context:
             self.container.resolve(FaultyService)
         self.assertIn("Custom error occurred.", str(context.exception))
+
+    def test_resolve_all_with_multiple_implementations(self):
+        class IService(ABC):
+            @abstractmethod
+            def process(self): ...
+
+        class ImplOne(IService):
+            def process(self):
+                return "Implementation One"
+
+        class ImplTwo(IService):
+            def process(self):
+                return "Implementation Two"
+
+        self.container.register(IService, ImplOne)
+        self.container.register(IService, ImplTwo)
+
+        services = self.container.resolve_all(IService)
+        results = [service.process() for service in services]
+
+        self.assertEqual(len(services), 2)
+        self.assertIn("Implementation One", results)
+        self.assertIn("Implementation Two", results)
+
+    def test_resolve_all_with_no_implementations(self):
+        class IService(ABC):
+            @abstractmethod
+            def process(self): ...
+
+        services = self.container.resolve_all(IService)
+        self.assertEqual(services, [])
+
+    def test_resolve_all_with_named_implementations(self):
+        class IService(ABC):
+            @abstractmethod
+            def process(self): ...
+
+        class ImplOne(IService):
+            def process(self):
+                return "Implementation One"
+
+        class ImplTwo(IService):
+            def process(self):
+                return "Implementation Two"
+
+        self.container.register(IService, ImplOne, name="one")
+        self.container.register(IService, ImplTwo, name="two")
+
+        services_all = self.container.resolve_all(IService)
+        self.assertEqual(len(services_all), 0)  # No unnamed registrations
+
+        service_one = self.container.resolve(IService, name="one")
+        service_two = self.container.resolve(IService, name="two")
+
+        self.assertEqual(service_one.process(), "Implementation One")
+        self.assertEqual(service_two.process(), "Implementation Two")
+
+    def test_resolve_all_with_mixed_lifestyles(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_id(self): ...
+
+        class ImplSingleton(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        class ImplTransient(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        self.container.register(IService, ImplSingleton, lifestyle=LifeStyle.SINGLETON)
+        self.container.register(IService, ImplTransient, lifestyle=LifeStyle.TRANSIENT)
+
+        services_first_call = self.container.resolve_all(IService)
+        services_second_call = self.container.resolve_all(IService)
+
+        self.assertEqual(len(services_first_call), 2)
+        self.assertEqual(len(services_second_call), 2)
+
+        singleton_ids = [
+            s.get_id() for s in services_first_call if isinstance(s, ImplSingleton)
+        ]
+        transient_ids_first = [
+            s.get_id() for s in services_first_call if isinstance(s, ImplTransient)
+        ]
+        transient_ids_second = [
+            s.get_id() for s in services_second_call if isinstance(s, ImplTransient)
+        ]
+
+        self.assertEqual(singleton_ids[0], services_second_call[0].get_id())
+        self.assertNotEqual(transient_ids_first[0], transient_ids_second[0])
+
+    def test_resolve_all_with_factories(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_value(self): ...
+
+        class ServiceA(IService):
+            def __init__(self):
+                self.value = "A"
+
+            def get_value(self):
+                return self.value
+
+        class ServiceB(IService):
+            def __init__(self):
+                self.value = "B"
+
+            def get_value(self):
+                return self.value
+
+        def factory_a():
+            return ServiceA()
+
+        def factory_b():
+            return ServiceB()
+
+        self.container.register_factory(IService, factory_a)
+        self.container.register_factory(IService, factory_b)
+
+        services = self.container.resolve_all(IService)
+        values = [service.get_value() for service in services]
+
+        self.assertEqual(len(services), 2)
+        self.assertIn("A", values)
+        self.assertIn("B", values)
+
+    def test_resolve_all_with_scoped_lifestyle(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_id(self): ...
+
+        class Service(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        self.container.register(IService, Service, lifestyle=LifeStyle.SCOPED)
+
+        scope1 = self.container.create_scope()
+        services1 = scope1.resolve_all(IService)
+        services1_again = scope1.resolve_all(IService)
+        self.assertEqual(len(services1), 1)
+        self.assertIs(services1[0], services1_again[0])
+
+        scope2 = self.container.create_scope()
+        services2 = scope2.resolve_all(IService)
+        self.assertIsNot(services1[0], services2[0])
+
+    def test_resolve_all_with_duplicate_implementations(self):
+        class IService(ABC):
+            @abstractmethod
+            def process(self): ...
+
+        class Impl(IService):
+            def process(self):
+                return "Implementation"
+
+        self.container.register(IService, Impl)
+        self.container.register(IService, Impl)
+
+        services = self.container.resolve_all(IService)
+        self.assertEqual(len(services), 2)
+        self.assertNotEqual(services[0], services[1])  # Should be different instances
+
+    def test_resolve_all_with_instances(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_value(self): ...
+
+        class Service(IService):
+            def __init__(self, value):
+                self.value = value
+
+            def get_value(self):
+                return self.value
+
+        instance1 = Service(1)
+        instance2 = Service(2)
+
+        self.container.add_instance(IService, instance1)
+        self.container.add_instance(IService, instance2)
+
+        services = self.container.resolve_all(IService)
+        values = [service.get_value() for service in services]
+
+        self.assertEqual(len(services), 2)
+        self.assertIn(1, values)
+        self.assertIn(2, values)
+        self.assertIn(instance1, services)
+        self.assertIn(instance2, services)
+
+    def test_resolve_all_with_no_registrations(self):
+        class IService(ABC):
+            @abstractmethod
+            def do_something(self): ...
+
+        services = self.container.resolve_all(IService)
+        self.assertEqual(services, [])
+
+    def test_resolve_all_with_named_and_unnamed_registrations(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_name(self): ...
+
+        class NamedService(IService):
+            def __init__(self, name: str):
+                self.name = name
+
+            def get_name(self):
+                return self.name
+
+        self.container.register_factory(IService, lambda: NamedService("Unnamed"))
+        self.container.register_factory(
+            IService, lambda: NamedService("Named One"), name="one"
+        )
+        self.container.register_factory(
+            IService, lambda: NamedService("Named Two"), name="two"
+        )
+
+        all_services = self.container.resolve_all(IService)
+        self.assertEqual(len(all_services), 1)
+        self.assertEqual(all_services[0].get_name(), "Unnamed")
+
+        named_services = []
+        for name in ["one", "two"]:
+            service = self.container.resolve(IService, name=name)
+            named_services.append(service)
+
+        names = [s.get_name() for s in named_services]
+        self.assertIn("Named One", names)
+        self.assertIn("Named Two", names)
+
+    def test_resolve_all_with_cyclic_dependency(self):
+        self.container.register(ServiceA_cyclic)
+        self.container.register(ServiceB_cyclic)
+        self.container.register(ServiceC_cyclic)
+
+        with self.assertRaises(CyclicDependencyException) as context:
+            self.container.resolve_all(ServiceA_cyclic)
+        self.assertIn("Cyclic dependency detected", str(context.exception))
+
+    def test_resolve_all_with_different_lifestyles(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_id(self): ...
+
+        class SingletonService(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        class TransientService(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        class ScopedService(IService):
+            def __init__(self):
+                self.id = id(self)
+
+            def get_id(self):
+                return self.id
+
+        self.container.register(
+            IService, SingletonService, lifestyle=LifeStyle.SINGLETON
+        )
+        self.container.register(
+            IService, TransientService, lifestyle=LifeStyle.TRANSIENT
+        )
+        self.container.register(IService, ScopedService, lifestyle=LifeStyle.SCOPED)
+
+        scope1 = self.container.create_scope()
+        services1 = scope1.resolve_all(IService)
+        services1_again = scope1.resolve_all(IService)
+
+        singleton_services1 = [s for s in services1 if isinstance(s, SingletonService)]
+        singleton_services1_again = [
+            s for s in services1_again if isinstance(s, SingletonService)
+        ]
+        self.assertIs(singleton_services1[0], singleton_services1_again[0])
+
+        scoped_services1 = [s for s in services1 if isinstance(s, ScopedService)]
+        scoped_services1_again = [
+            s for s in services1_again if isinstance(s, ScopedService)
+        ]
+        self.assertIs(scoped_services1[0], scoped_services1_again[0])
+
+        transient_services1 = [s for s in services1 if isinstance(s, TransientService)]
+        transient_services1_again = [
+            s for s in services1_again if isinstance(s, TransientService)
+        ]
+        self.assertIsNot(transient_services1[0], transient_services1_again[0])
+
+        scope2 = self.container.create_scope()
+        services2 = scope2.resolve_all(IService)
+
+        scoped_services2 = [s for s in services2 if isinstance(s, ScopedService)]
+        self.assertIsNot(scoped_services1[0], scoped_services2[0])
+
+    def test_resolve_all_with_unregistered_interface(self):
+        class IService(ABC):
+            @abstractmethod
+            def do_something(self): ...
+
+        services = self.container.resolve_all(IService)
+        self.assertEqual(services, [])
+
+    def test_resolve_all_with_mixed_registration_types(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_value(self): ...
+
+        class ServiceA(IService):
+            def __init__(self, value: str = "A"):
+                self.value = value
+
+            def get_value(self):
+                return self.value
+
+        class ServiceB(IService):
+            def __init__(self, value: str = "B"):
+                self.value = value
+
+            def get_value(self):
+                return self.value
+
+        def factory_service_c():
+            class ServiceC(IService):
+                def __init__(self, value: str = "C"):
+                    self.value = value
+
+                def get_value(self):
+                    return self.value
+
+            return ServiceC()
+
+        instance_service_d = ServiceA("D")
+
+        self.container.register(IService, ServiceA)
+        self.container.register_factory(IService, factory_service_c)
+        self.container.add_instance(IService, instance_service_d)
+        self.container.register(IService, ServiceB)
+
+        services = self.container.resolve_all(IService)
+        values = [service.get_value() for service in services]
+
+        self.assertEqual(len(services), 4)
+        self.assertIn("A", values)
+        self.assertIn("B", values)
+        self.assertIn("C", values)
+        self.assertIn("D", values)
+
+    def test_resolve_all_with_named_instances(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_value(self): ...
+
+        class Service(IService):
+            def __init__(self, value):
+                self.value = value
+
+            def get_value(self):
+                return self.value
+
+        instance1 = Service("Instance One")
+        instance2 = Service("Instance Two")
+
+        self.container.add_instance(IService, instance1, name="one")
+        self.container.add_instance(IService, instance2, name="two")
+
+        services = self.container.resolve_all(IService)
+        self.assertEqual(len(services), 0)
+
+        service_one = self.container.resolve(IService, name="one")
+        service_two = self.container.resolve(IService, name="two")
+
+        self.assertEqual(service_one.get_value(), "Instance One")
+        self.assertEqual(service_two.get_value(), "Instance Two")
+
+    def test_resolve_all_with_multiple_factories(self):
+        class IService(ABC):
+            @abstractmethod
+            def get_value(self): ...
+
+        def factory_service_a():
+            class ServiceA(IService):
+                def get_value(self):
+                    return "A"
+
+            return ServiceA()
+
+        def factory_service_b():
+            class ServiceB(IService):
+                def get_value(self):
+                    return "B"
+
+            return ServiceB()
+
+        self.container.register_factory(IService, factory_service_a)
+        self.container.register_factory(IService, factory_service_b)
+
+        services = self.container.resolve_all(IService)
+        values = [service.get_value() for service in services]
+
+        self.assertEqual(len(services), 2)
+        self.assertIn("A", values)
+        self.assertIn("B", values)
+
+    def test_resolve_all_with_exception_in_factory(self):
+        class IService(ABC):
+            @abstractmethod
+            def do_something(self): ...
+
+        def faulty_factory():
+            raise Exception("Factory error")
+
+        self.container.register_factory(IService, faulty_factory)
+
+        with self.assertRaises(Exception) as context:
+            self.container.resolve_all(IService)
+        self.assertIn("Factory error", str(context.exception))
 
 
 if __name__ == "__main__":
