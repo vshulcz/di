@@ -1,21 +1,27 @@
+# Injex - DI Container for Python
+
 ![Build Status](https://github.com/vshulcz/di/actions/workflows/ci.yml/badge.svg)
-![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)
-![License](https://img.shields.io/github/license/vshulcz/di.svg)
+[![pypi](https://img.shields.io/pypi/v/injex.svg)](https://pypi.python.org/pypi/injex)
+[![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://github.com/vshulcz/injex)
+[![License](https://img.shields.io/github/license/vshulcz/di.svg)](https://github.com/vshulcz/injex/LICENSE)
 
-
-# DI Container for Python
-
-Injex is a lightweight and easy-to-use DI container for Python applications. This library aims to simplify the management of dependencies in your projects, making your code more modular, testable, and maintainable. This library inspired by popular DI frameworks in other programming languages.
-
+Injex is a lightweight and easy-to-use Dependency Injection (DI) container for Python applications. It simplifies dependency management, making your code more modular, testable, and maintainable. Injex is inspired by popular DI frameworks in other programming languages and brings similar capabilities to Python.
 
 ## Features
 
-* 🌟 Simple API: Easy to understand and use.
-* 🔄 Support for singleton, transient, and scoped services.
-* Register multiple implementations of the same interface using names.
-* 🔍 Inject dependencies into properties after object creation.
-* 🛠 Handle optional dependencies gracefully.
+🌟 Simple API: Easy to understand and use.
+🔄 Multiple Lifestyles: Support for singleton, transient, and scoped services.
+🧩 Flexible Registrations: Register services, factories, and instances.
+🏷️ Named Registrations: Register multiple implementations of the same interface using names.
+🔍 Property Injection: Inject dependencies into properties after object creation.
+🛠 Optional Dependencies: Handle optional dependencies gracefully.
+🚀 No External Dependencies: Pure Python implementation without third-party packages.
 
+## Installation
+
+```bash
+pip install injex
+```
 
 ## Why Use Dependency Injection?
 
@@ -50,3 +56,11 @@ service = container.resolve(IService)
 service.perform_action() # output: Service is performing an action.
 ```
 Another examples in [examples folder](./examples).
+
+## Documentation
+
+For detailed documentation on all functionalities, usage examples, and best practices, please refer to the [Documentation](./docs/tutorial.md).
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
