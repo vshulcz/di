@@ -9,13 +9,13 @@ Injex is a lightweight and easy-to-use Dependency Injection (DI) container for P
 
 ## Features
 
-🌟 Simple API: Easy to understand and use.
-🔄 Multiple Lifestyles: Support for singleton, transient, and scoped services.
-🧩 Flexible Registrations: Register services, factories, and instances.
-🏷️ Named Registrations: Register multiple implementations of the same interface using names.
-🔍 Property Injection: Inject dependencies into properties after object creation.
-🛠 Optional Dependencies: Handle optional dependencies gracefully.
-🚀 No External Dependencies: Pure Python implementation without third-party packages.
+* 🌟 Simple API: Easy to understand and use.
+* 🔄 Multiple Lifestyles: Support for singleton, transient, and scoped services.
+* 🧩 Flexible Registrations: Register services, factories, and instances.
+* 🏷️ Named Registrations: Register multiple implementations of the same interface using names.
+* 🔍 Property Injection: Inject dependencies into properties after object creation.
+* 🛠 Optional Dependencies: Handle optional dependencies gracefully.
+* 🚀 No External Dependencies: Pure Python implementation without third-party packages.
 
 ## Installation
 
