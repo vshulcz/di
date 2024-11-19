@@ -2,6 +2,7 @@
 
 ![Build Status](https://github.com/vshulcz/di/actions/workflows/ci.yml/badge.svg)
 [![pypi](https://img.shields.io/pypi/v/injex.svg)](https://pypi.python.org/pypi/injex)
+[![Coverage](https://codecov.io/gh/vshulcz/injex/branch/main/graph/badge.svg)](https://codecov.io/gh/vshulcz/injex)
 [![Python Versions](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://github.com/vshulcz/injex)
 [![License](https://img.shields.io/github/license/vshulcz/di.svg)](https://github.com/vshulcz/injex/LICENSE)
 

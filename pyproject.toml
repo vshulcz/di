@@ -1,6 +1,6 @@
 [project]
 name = "injex"
-version = "0.1.2"
+version = "1.0.0"
 authors = [{name = "vshulcz", email = "vshulcz@gmail.com"}]
 description = "DI container for Python applications"
 readme = "README.md"
@@ -21,6 +21,7 @@ dependencies = []
 [tool.uv]
 dev-dependencies = [
     "mypy>=1.12.1",
+    "pytest-cov>=6.0.0",
     "pytest>=8.3.3",
     "ruff>=0.7.0",
 ]
