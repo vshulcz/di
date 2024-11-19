@@ -149,3 +149,19 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: true
           verbose: true
+  
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
