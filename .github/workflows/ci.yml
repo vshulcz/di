@@ -50,6 +50,9 @@ jobs:
     name: Lint Code
     runs-on: ubuntu-latest
     needs: setup
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Download environment
@@ -72,6 +75,9 @@ jobs:
     name: Type Checking
     runs-on: ubuntu-latest
     needs: setup
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Download environment
@@ -103,7 +109,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-
       - name: Run tests with coverage
         run: |
           uv run pytest --cov=injex --cov-report=xml
@@ -119,6 +124,7 @@ jobs:
     name: Upload Coverage to Codecov
     runs-on: ubuntu-latest
     needs: test
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
