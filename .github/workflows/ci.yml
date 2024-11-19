@@ -7,9 +7,11 @@ on:
   pull_request:
     branches:
       - "*"
+  workflow_dispatch:
 
 jobs:
-  build:
+  setup:
+    name: Setup Environment
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,26 +34,94 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install uv
+      - name: Install uv and dependencies
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          uv sync
+      
+      - name: Save environment as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-env-${{ matrix.python-version }}
+          path: ~/.cache/uv
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Download environment
+        uses: actions/download-artifact@v3
+        with:
+          name: python-env-${{ matrix.python-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Run linters
         run: |
           uv run ruff check .
-
+      
       - name: Run format checks
         run: |
           uv run ruff format --check .
+  
+  type-check:
+    name: Type Checking
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Download environment
+        uses: actions/download-artifact@v3
+        with:
+          name: python-env-${{ matrix.python-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Run type checks
         run: |
           uv run mypy injex tests
 
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Download environment
+        uses: actions/download-artifact@v3
+        with:
+          name: python-env-${{ matrix.python-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
       - name: Run tests with coverage
         run: |
           uv run pytest --cov=injex --cov-report=xml
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: ./test-reports/
+    
+  coverage:
+    name: Upload Coverage to Codecov
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
