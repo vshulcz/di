@@ -154,6 +154,10 @@ jobs:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
     needs: [lint, type-check, test]
+    permissions:
+      contents: read
+      security-events: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
